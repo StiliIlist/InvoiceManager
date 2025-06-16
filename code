@@ -3,572 +3,503 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Input Template</title>
+    <title>Excel Invoice Template Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-            line-height: 1.4;
-        }
-        
-        .invoice-container {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            max-width: 900px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
             margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
-        
-        .invoice-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            border-bottom: 3px solid #2c5aa0;
-            padding-bottom: 20px;
-            flex-wrap: wrap;
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
-        
-        .company-info {
-            flex: 1;
-            min-width: 300px;
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            font-weight: 300;
         }
-        
-        .company-info h1 {
-            color: #2c5aa0;
-            margin: 0 0 15px 0;
-            font-size: 28px;
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 1.2em;
         }
-        
-        .company-details {
-            color: #666;
-            line-height: 1.6;
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid #3498db;
         }
-        
-        .invoice-details {
-            text-align: right;
-            min-width: 250px;
+
+        .form-section h3 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.3em;
         }
-        
-        .invoice-details h2 {
-            color: #2c5aa0;
-            margin: 0 0 20px 0;
-            font-size: 24px;
-        }
-        
-        .billing-section {
+
+        .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        
-        .billing-section h3 {
-            color: #2c5aa0;
+            gap: 20px;
             margin-bottom: 15px;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 8px;
-            font-size: 16px;
         }
-        
+
         .form-group {
-            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
         }
-        
-        .form-group label {
-            display: block;
-            font-weight: bold;
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 600;
             margin-bottom: 5px;
-            color: #333;
-            font-size: 14px;
+            color: #34495e;
+            font-size: 0.9em;
         }
-        
-        .form-group input, 
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
+
+        input, textarea, select {
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
             font-size: 14px;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
         }
-        
-        .form-group input:focus, 
-        .form-group textarea:focus {
+
+        input:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: #2c5aa0;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
         }
-        
-        .form-group textarea {
+
+        textarea {
             resize: vertical;
-            height: 70px;
+            min-height: 80px;
         }
-        
-        .items-section h3 {
-            color: #2c5aa0;
-            margin-bottom: 20px;
-            font-size: 18px;
+
+        .items-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid #e74c3c;
         }
-        
+
         .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin-top: 15px;
             background: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        
+
         .items-table th {
-            background: #2c5aa0;
+            background: #34495e;
             color: white;
             padding: 15px 10px;
             text-align: left;
-            font-weight: bold;
-            font-size: 14px;
+            font-size: 0.9em;
+            font-weight: 600;
         }
-        
+
         .items-table td {
             padding: 12px 10px;
-            border-bottom: 1px solid #eee;
-            vertical-align: middle;
+            border-bottom: 1px solid #ecf0f1;
         }
-        
-        .items-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        
-        .items-table tr:hover {
-            background-color: #f0f8ff;
-        }
-        
+
         .items-table input {
             width: 100%;
             border: 1px solid #ddd;
             padding: 8px;
-            background: white;
-            font-size: 13px;
-            border-radius: 3px;
+            border-radius: 4px;
         }
-        
-        .items-table input:focus {
-            background: #fff;
-            outline: none;
-            border-color: #2c5aa0;
-        }
-        
-        .number-input {
-            text-align: right;
-        }
-        
-        .amount-cell {
-            text-align: right;
-            font-weight: bold;
-            color: #2c5aa0;
-            background-color: #f8f9fa;
-        }
-        
-        .add-row-btn {
-            background: #28a745;
+
+        .add-item-btn {
+            background: #27ae60;
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 5px;
+            padding: 12px 20px;
+            border-radius: 6px;
             cursor: pointer;
-            margin: 15px 0;
-            font-size: 14px;
-            font-weight: bold;
-            transition: background-color 0.3s;
+            margin-top: 15px;
+            font-weight: 600;
+            transition: background 0.3s ease;
         }
-        
-        .add-row-btn:hover {
-            background: #218838;
+
+        .add-item-btn:hover {
+            background: #229954;
         }
-        
-        .summary-section {
-            float: right;
-            width: 350px;
+
+        .generate-section {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            border-radius: 10px;
             margin-top: 30px;
-            clear: both;
         }
-        
-        .summary-table {
-            width: 100%;
-            border-collapse: collapse;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+        .generate-btn {
+            background: white;
+            color: #27ae60;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        
-        .summary-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #ddd;
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
         }
-        
-        .summary-table .label {
-            font-weight: bold;
-            text-align: right;
-            background: #f8f9fa;
-            color: #333;
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
         }
-        
-        .summary-table .amount {
-            text-align: right;
-            font-family: monospace;
-            font-size: 16px;
-            font-weight: bold;
+
+        .feature {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-top: 4px solid #3498db;
         }
-        
-        .total-due {
-            background: #2c5aa0 !important;
-            color: white !important;
-            font-weight: bold;
-            font-size: 18px;
-        }
-        
-        .notes-section {
-            clear: both;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 2px solid #eee;
-        }
-        
-        .notes-section h3 {
-            color: #2c5aa0;
+
+        .feature-icon {
+            font-size: 2.5em;
             margin-bottom: 15px;
         }
-        
-        .export-btn {
-            background: #2c5aa0;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 20px;
-            transition: background-color 0.3s;
+
+        .feature h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
         }
-        
-        .export-btn:hover {
-            background: #1e3d6f;
+
+        .feature p {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            line-height: 1.5;
         }
-        
-        .editable {
-            border: 1px dashed #ccc;
-            padding: 5px;
-            cursor: text;
-        }
-        
-        .editable:hover {
-            background-color: #f9f9f9;
-        }
-        
+
         @media (max-width: 768px) {
-            .invoice-header {
-                flex-direction: column;
-            }
-            
-            .invoice-details {
-                text-align: left;
-                margin-top: 20px;
-            }
-            
-            .billing-section {
+            .form-row {
                 grid-template-columns: 1fr;
             }
             
-            .summary-section {
-                float: none;
-                width: 100%;
+            .container {
+                padding: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="invoice-container">
-        <!-- Header Section -->
-        <div class="invoice-header">
-            <div class="company-info">
-                <h1 class="editable" contenteditable="true">Your Company Name</h1>
-                <div class="company-details editable" contenteditable="true">
-                    123 Business Street<br>
-                    City, State 12345<br>
-                    Phone: (555) 123-4567<br>
-                    Email: info@yourcompany.com
-                </div>
+    <div class="container">
+        <h1>📊 Excel Invoice Generator</h1>
+        <p class="subtitle">Create professional Excel invoice templates with automatic calculations</p>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📋</div>
+                <h4>Excel Compatible</h4>
+                <p>Generates real XLSX files that open perfectly in Microsoft Excel</p>
             </div>
-            <div class="invoice-details">
-                <h2>INVOICE</h2>
-                <div class="form-group">
-                    <label for="invoiceNumber">Invoice #:</label>
-                    <input type="text" id="invoiceNumber" value="INV-001">
-                </div>
-                <div class="form-group">
-                    <label for="invoiceDate">Date:</label>
-                    <input type="date" id="invoiceDate">
-                </div>
-                <div class="form-group">
-                    <label for="dueDate">Due Date:</label>
-                    <input type="date" id="dueDate">
-                </div>
+            <div class="feature">
+                <div class="feature-icon">🧮</div>
+                <h4>Auto Calculations</h4>
+                <p>Built-in formulas for totals, taxes, and line item calculations</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎨</div>
+                <h4>Professional Design</h4>
+                <p>Clean, professional formatting with proper styling</p>
             </div>
         </div>
 
-        <!-- Billing Information -->
-        <div class="billing-section">
-            <div class="bill-to">
-                <h3>Bill To:</h3>
-                <div class="form-group">
-                    <label for="clientName">Client Name:</label>
-                    <input type="text" id="clientName" placeholder="Enter client name">
+        <form id="invoiceForm">
+            <!-- Company Information -->
+            <div class="form-section">
+                <h3>🏢 Company Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="companyName">Company Name</label>
+                        <input type="text" id="companyName" value="Your Company Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="companyPhone">Phone</label>
+                        <input type="tel" id="companyPhone" value="(555) 123-4567">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="clientAddress">Address:</label>
-                    <textarea id="clientAddress" placeholder="Enter client address"></textarea>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="companyAddress">Address</label>
+                        <textarea id="companyAddress">123 Business Street&#10;City, State 12345</textarea>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="clientEmail">Email:</label>
-                    <input type="email" id="clientEmail" placeholder="client@email.com">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="companyEmail">Email</label>
+                        <input type="email" id="companyEmail" value="info@yourcompany.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="companyWebsite">Website</label>
+                        <input type="url" id="companyWebsite" value="www.yourcompany.com">
+                    </div>
                 </div>
             </div>
-            <div class="ship-to">
-                <h3>Ship To: <small>(if different)</small></h3>
-                <div class="form-group">
-                    <label for="shipName">Name:</label>
-                    <input type="text" id="shipName" placeholder="Shipping contact">
+
+            <!-- Invoice Settings -->
+            <div class="form-section">
+                <h3>⚙️ Invoice Settings</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="invoicePrefix">Invoice Number Prefix</label>
+                        <input type="text" id="invoicePrefix" value="INV-">
+                    </div>
+                    <div class="form-group">
+                        <label for="startingNumber">Starting Number</label>
+                        <input type="number" id="startingNumber" value="1001" min="1">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="shipAddress">Address:</label>
-                    <textarea id="shipAddress" placeholder="Shipping address"></textarea>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="defaultTax">Default Tax Rate (%)</label>
+                        <input type="number" id="defaultTax" value="8.25" step="0.01" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentTerms">Payment Terms (Days)</label>
+                        <input type="number" id="paymentTerms" value="30" min="1">
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Items Section -->
-        <div class="items-section">
-            <h3>Invoice Items</h3>
-            <table class="items-table">
-                <thead>
-                    <tr>
-                        <th style="width: 40%">Description</th>
-                        <th style="width: 12%">Qty</th>
-                        <th style="width: 15%">Rate</th>
-                        <th style="width: 13%">Tax %</th>
-                        <th style="width: 20%">Amount</th>
-                    </tr>
-                </thead>
-                <tbody id="itemsBody">
-                    <tr>
-                        <td><input type="text" placeholder="Enter description" class="desc-input"></td>
-                        <td><input type="number" step="0.01" min="0" placeholder="1" class="qty-input number-input"></td>
-                        <td><input type="number" step="0.01" min="0" placeholder="0.00" class="rate-input number-input"></td>
-                        <td><input type="number" step="0.01" min="0" max="100" placeholder="0" class="tax-input number-input"></td>
-                        <td class="amount-cell">$0.00</td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <button class="add-row-btn" onclick="addNewRow()">+ Add Line Item</button>
-        </div>
-
-        <!-- Summary Section -->
-        <div class="summary-section">
-            <table class="summary-table">
-                <tr>
-                    <td class="label">Subtotal:</td>
-                    <td class="amount" id="subtotalAmount">$0.00</td>
-                </tr>
-                <tr>
-                    <td class="label">Tax Total:</td>
-                    <td class="amount" id="taxTotalAmount">$0.00</td>
-                </tr>
-                <tr>
-                    <td class="label">Discount:</td>
-                    <td>
-                        <input type="number" id="discountAmount" step="0.01" min="0" value="0" 
-                               style="width: 100%; text-align: right; border: 1px solid #ddd; padding: 8px; border-radius: 3px;">
-                    </td>
-                </tr>
-                <tr class="total-due">
-                    <td class="label">TOTAL DUE:</td>
-                    <td class="amount" id="totalDueAmount">$0.00</td>
-                </tr>
-            </table>
-        </div>
-
-        <!-- Notes Section -->
-        <div class="notes-section">
-            <h3>Notes & Terms</h3>
-            <div class="form-group">
-                <textarea id="invoiceNotes" placeholder="Enter payment terms, notes, or additional information..." style="height: 100px;"></textarea>
+            <!-- Sample Items -->
+            <div class="items-section">
+                <h3>📝 Sample Invoice Items (Optional)</h3>
+                <p style="color: #7f8c8d; margin-bottom: 15px;">Add sample items to pre-populate your template</p>
+                
+                <table class="items-table" id="itemsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%">Description</th>
+                            <th style="width: 15%">Quantity</th>
+                            <th style="width: 15%">Rate</th>
+                            <th style="width: 15%">Tax %</th>
+                            <th style="width: 15%">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsBody">
+                        <tr>
+                            <td><input type="text" placeholder="Product/Service description" class="item-desc"></td>
+                            <td><input type="number" step="0.01" placeholder="1" class="item-qty"></td>
+                            <td><input type="number" step="0.01" placeholder="0.00" class="item-rate"></td>
+                            <td><input type="number" step="0.01" placeholder="0.00" class="item-tax"></td>
+                            <td><button type="button" onclick="removeItem(this)" style="background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">Remove</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <button type="button" class="add-item-btn" onclick="addItem()">+ Add Sample Item</button>
             </div>
-        </div>
+        </form>
 
-        <button class="export-btn" onclick="downloadCSV()">Export to CSV</button>
+        <div class="generate-section">
+            <h3 style="color: white; margin-bottom: 15px;">🚀 Generate Your Excel Invoice Template</h3>
+            <p style="color: rgba(255,255,255,0.9); margin-bottom: 25px;">
+                Click below to download a professional Excel invoice template with all your settings
+            </p>
+            <button class="generate-btn" onclick="generateExcel()">
+                📥 Download Excel Template
+            </button>
+        </div>
     </div>
 
     <script>
-        // Initialize the page
-        function initializePage() {
-            console.log('Initializing invoice page...');
-            
-            // Set current date
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('invoiceDate').value = today;
-            
-            // Set due date (30 days from today)
-            const dueDate = new Date();
-            dueDate.setDate(dueDate.getDate() + 30);
-            document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
-            
-            // Add event listeners to existing row
-            attachRowListeners();
-            
-            // Add discount listener
-            document.getElementById('discountAmount').addEventListener('input', calculateSummary);
-            
-            console.log('Page initialized successfully');
-        }
-
-        function attachRowListeners() {
-            const rows = document.querySelectorAll('#itemsBody tr');
-            rows.forEach(row => {
-                const inputs = row.querySelectorAll('.qty-input, .rate-input, .tax-input');
-                inputs.forEach(input => {
-                    input.addEventListener('input', function() {
-                        calculateRowAmount(this.closest('tr'));
-                        calculateSummary();
-                    });
-                });
-            });
-        }
-
-        function addNewRow() {
+        function addItem() {
             const tbody = document.getElementById('itemsBody');
             const newRow = document.createElement('tr');
-            
             newRow.innerHTML = `
-                <td><input type="text" placeholder="Enter description" class="desc-input"></td>
-                <td><input type="number" step="0.01" min="0" placeholder="1" class="qty-input number-input"></td>
-                <td><input type="number" step="0.01" min="0" placeholder="0.00" class="rate-input number-input"></td>
-                <td><input type="number" step="0.01" min="0" max="100" placeholder="0" class="tax-input number-input"></td>
-                <td class="amount-cell">$0.00</td>
+                <td><input type="text" placeholder="Product/Service description" class="item-desc"></td>
+                <td><input type="number" step="0.01" placeholder="1" class="item-qty"></td>
+                <td><input type="number" step="0.01" placeholder="0.00" class="item-rate"></td>
+                <td><input type="number" step="0.01" placeholder="0.00" class="item-tax"></td>
+                <td><button type="button" onclick="removeItem(this)" style="background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">Remove</button></td>
             `;
-            
             tbody.appendChild(newRow);
-            
-            // Add listeners to new row
-            const inputs = newRow.querySelectorAll('.qty-input, .rate-input, .tax-input');
-            inputs.forEach(input => {
-                input.addEventListener('input', function() {
-                    calculateRowAmount(this.closest('tr'));
-                    calculateSummary();
-                });
-            });
         }
 
-        function calculateRowAmount(row) {
-            const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
-            const rate = parseFloat(row.querySelector('.rate-input').value) || 0;
-            const taxPercent = parseFloat(row.querySelector('.tax-input').value) || 0;
-            
-            const subtotal = qty * rate;
-            const taxAmount = subtotal * (taxPercent / 100);
-            const total = subtotal + taxAmount;
-            
-            row.querySelector('.amount-cell').textContent = '$' + total.toFixed(2);
+        function removeItem(button) {
+            const row = button.closest('tr');
+            if (document.querySelectorAll('#itemsBody tr').length > 1) {
+                row.remove();
+            } else {
+                alert('At least one item row must remain');
+            }
         }
 
-        function calculateSummary() {
-            let subtotal = 0;
-            let totalTax = 0;
-            
-            const rows = document.querySelectorAll('#itemsBody tr');
-            rows.forEach(row => {
-                const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
-                const rate = parseFloat(row.querySelector('.rate-input').value) || 0;
-                const taxPercent = parseFloat(row.querySelector('.tax-input').value) || 0;
+        function generateExcel() {
+            // Get form data
+            const companyName = document.getElementById('companyName').value;
+            const companyAddress = document.getElementById('companyAddress').value;
+            const companyPhone = document.getElementById('companyPhone').value;
+            const companyEmail = document.getElementById('companyEmail').value;
+            const companyWebsite = document.getElementById('companyWebsite').value;
+            const invoicePrefix = document.getElementById('invoicePrefix').value;
+            const startingNumber = document.getElementById('startingNumber').value;
+            const defaultTax = document.getElementById('defaultTax').value;
+            const paymentTerms = document.getElementById('paymentTerms').value;
+
+            // Create workbook and worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = {};
+
+            // Company Information Section
+            ws['A1'] = { v: 'INVOICE', t: 's' };
+            ws['A3'] = { v: companyName, t: 's' };
+            ws['A4'] = { v: companyAddress.replace(/\n/g, ', '), t: 's' };
+            ws['A5'] = { v: companyPhone, t: 's' };
+            ws['A6'] = { v: companyEmail, t: 's' };
+            ws['A7'] = { v: companyWebsite, t: 's' };
+
+            // Invoice Details
+            ws['F1'] = { v: 'Invoice #:', t: 's' };
+            ws['G1'] = { v: invoicePrefix + startingNumber, t: 's' };
+            ws['F2'] = { v: 'Date:', t: 's' };
+            ws['G2'] = { v: new Date(), t: 'd' };
+            ws['F3'] = { v: 'Due Date:', t: 's' };
+            const dueDate = new Date();
+            dueDate.setDate(dueDate.getDate() + parseInt(paymentTerms));
+            ws['G3'] = { v: dueDate, t: 'd' };
+
+            // Bill To Section
+            ws['A9'] = { v: 'BILL TO:', t: 's' };
+            ws['A10'] = { v: '[Client Name]', t: 's' };
+            ws['A11'] = { v: '[Client Address]', t: 's' };
+            ws['A12'] = { v: '[Client Email]', t: 's' };
+            ws['A13'] = { v: '[Client Phone]', t: 's' };
+
+            // Ship To Section
+            ws['D9'] = { v: 'SHIP TO:', t: 's' };
+            ws['D10'] = { v: '[Shipping Contact]', t: 's' };
+            ws['D11'] = { v: '[Shipping Address]', t: 's' };
+            ws['D12'] = { v: '[Shipping Email]', t: 's' };
+
+            // Items Header
+            ws['A15'] = { v: 'DESCRIPTION', t: 's' };
+            ws['B15'] = { v: 'QTY', t: 's' };
+            ws['C15'] = { v: 'RATE', t: 's' };
+            ws['D15'] = { v: 'TAX %', t: 's' };
+            ws['E15'] = { v: 'SUBTOTAL', t: 's' };
+            ws['F15'] = { v: 'TAX AMOUNT', t: 's' };
+            ws['G15'] = { v: 'TOTAL', t: 's' };
+
+            // Get sample items
+            const itemRows = document.querySelectorAll('#itemsBody tr');
+            let currentRow = 16;
+
+            itemRows.forEach((row, index) => {
+                const desc = row.querySelector('.item-desc').value || '[Item Description]';
+                const qty = row.querySelector('.item-qty').value || '1';
+                const rate = row.querySelector('.item-rate').value || '0.00';
+                const tax = row.querySelector('.item-tax').value || defaultTax;
+
+                ws[`A${currentRow}`] = { v: desc, t: 's' };
+                ws[`B${currentRow}`] = { v: parseFloat(qty), t: 'n' };
+                ws[`C${currentRow}`] = { v: parseFloat(rate), t: 'n' };
+                ws[`D${currentRow}`] = { v: parseFloat(tax), t: 'n' };
+                ws[`E${currentRow}`] = { v: `=B${currentRow}*C${currentRow}`, t: 'f' };
+                ws[`F${currentRow}`] = { v: `=E${currentRow}*(D${currentRow}/100)`, t: 'f' };
+                ws[`G${currentRow}`] = { v: `=E${currentRow}+F${currentRow}`, t: 'f' };
                 
-                const lineSubtotal = qty * rate;
-                const lineTax = lineSubtotal * (taxPercent / 100);
-                
-                subtotal += lineSubtotal;
-                totalTax += lineTax;
+                currentRow++;
             });
-            
-            const discount = parseFloat(document.getElementById('discountAmount').value) || 0;
-            const grandTotal = subtotal + totalTax - discount;
-            
-            document.getElementById('subtotalAmount').textContent = '$' + subtotal.toFixed(2);
-            document.getElementById('taxTotalAmount').textContent = '$' + totalTax.toFixed(2);
-            document.getElementById('totalDueAmount').textContent = '$' + grandTotal.toFixed(2);
-        }
 
-        function downloadCSV() {
-            const csvData = [];
-            const invoiceNum = document.getElementById('invoiceNumber').value;
+            // Add 5 more empty rows for additional items
+            for (let i = 0; i < 5; i++) {
+                ws[`A${currentRow}`] = { v: '[Item Description]', t: 's' };
+                ws[`B${currentRow}`] = { v: 1, t: 'n' };
+                ws[`C${currentRow}`] = { v: 0.00, t: 'n' };
+                ws[`D${currentRow}`] = { v: parseFloat(defaultTax), t: 'n' };
+                ws[`E${currentRow}`] = { v: `=B${currentRow}*C${currentRow}`, t: 'f' };
+                ws[`F${currentRow}`] = { v: `=E${currentRow}*(D${currentRow}/100)`, t: 'f' };
+                ws[`G${currentRow}`] = { v: `=E${currentRow}+F${currentRow}`, t: 'f' };
+                currentRow++;
+            }
+
+            // Summary section
+            const summaryRow = currentRow + 2;
+            ws[`E${summaryRow}`] = { v: 'Subtotal:', t: 's' };
+            ws[`G${summaryRow}`] = { v: `=SUM(E16:E${currentRow-1})`, t: 'f' };
             
-            // Header information
-            csvData.push(['Invoice Number', invoiceNum]);
-            csvData.push(['Invoice Date', document.getElementById('invoiceDate').value]);
-            csvData.push(['Due Date', document.getElementById('dueDate').value]);
-            csvData.push(['Client Name', document.getElementById('clientName').value]);
-            csvData.push([]);
+            ws[`E${summaryRow+1}`] = { v: 'Tax Total:', t: 's' };
+            ws[`G${summaryRow+1}`] = { v: `=SUM(F16:F${currentRow-1})`, t: 'f' };
             
-            // Items header
-            csvData.push(['Description', 'Quantity', 'Rate', 'Tax %', 'Amount']);
+            ws[`E${summaryRow+2}`] = { v: 'Discount:', t: 's' };
+            ws[`G${summaryRow+2}`] = { v: 0.00, t: 'n' };
             
-            // Items data
-            const rows = document.querySelectorAll('#itemsBody tr');
-            rows.forEach(row => {
-                const desc = row.querySelector('.desc-input').value;
-                const qty = row.querySelector('.qty-input').value;
-                const rate = row.querySelector('.rate-input').value;
-                const tax = row.querySelector('.tax-input').value;
-                const amount = row.querySelector('.amount-cell').textContent;
-                
-                if (desc || qty || rate) {
-                    csvData.push([desc, qty, rate, tax, amount]);
-                }
+            ws[`E${summaryRow+3}`] = { v: 'TOTAL DUE:', t: 's' };
+            ws[`G${summaryRow+3}`] = { v: `=G${summaryRow}+G${summaryRow+1}-G${summaryRow+2}`, t: 'f' };
+
+            // Notes section
+            ws[`A${summaryRow+5}`] = { v: 'NOTES & TERMS:', t: 's' };
+            ws[`A${summaryRow+6}`] = { v: `Payment due within ${paymentTerms} days`, t: 's' };
+            ws[`A${summaryRow+7}`] = { v: 'Please make checks payable to ' + companyName, t: 's' };
+
+            // Set column widths and ranges
+            const range = XLSX.utils.encode_range({
+                s: { c: 0, r: 0 },
+                e: { c: 6, r: summaryRow + 10 }
             });
-            
-            // Summary
-            csvData.push([]);
-            csvData.push(['Subtotal', '', '', '', document.getElementById('subtotalAmount').textContent]);
-            csvData.push(['Tax Total', '', '', '', document.getElementById('taxTotalAmount').textContent]);
-            csvData.push(['Discount', '', '', '', '$' + (document.getElementById('discountAmount').value || '0.00')]);
-            csvData.push(['TOTAL DUE', '', '', '', document.getElementById('totalDueAmount').textContent]);
-            
-            // Convert to CSV format
-            const csvContent = csvData.map(row => 
-                row.map(cell => `"${cell}"`).join(',')
-            ).join('\n');
-            
-            // Create and download file
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', `invoice_${invoiceNum || 'template'}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+            ws['!ref'] = range;
 
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', initializePage);
-        
-        // Fallback initialization
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializePage);
-        } else {
-            initializePage();
+            // Column widths
+            ws['!cols'] = [
+                { wch: 30 }, // A - Description
+                { wch: 8 },  // B - Qty
+                { wch: 12 }, // C - Rate
+                { wch: 8 },  // D - Tax %
+                { wch: 12 }, // E - Subtotal
+                { wch: 12 }, // F - Tax Amount
+                { wch: 12 }  // G - Total
+            ];
+
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Invoice Template');
+
+            // Generate filename
+            const filename = `Invoice_Template_${companyName.replace(/[^a-zA-Z0-9]/g, '_')}.xlsx`;
+
+            // Write and download file
+            XLSX.writeFile(wb, filename);
+            
+            alert('Excel invoice template generated successfully! The file will download shortly.');
         }
     </script>
 </body>
